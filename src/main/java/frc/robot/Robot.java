@@ -5,6 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+//This is a program for automatic gear shifting
+//Originally developed by Benjamin Papez
+
+
+//this are the imported libraries
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -88,6 +93,7 @@ public class Robot extends TimedRobot
 
     //This is an advanced camera server program
     //it should help us to control the framerate and resolution
+    //it doesnt work yet, dont try to use it
     new Thread(() -> {
       UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
       camera.setResolution(640, 480);
@@ -170,14 +176,16 @@ public class Robot extends TimedRobot
       //This is the code to use arcade mode tank drive
       Right.set(ControlMode.PercentOutput, (Joystick1.getAxis(AxisType.kY) - -Joystick1.getAxis(AxisType.kX)));
       Left.set(ControlMode.PercentOutput, (Joystick1.getAxis(AxisType.kY) + -Joystick1.getAxis(AxisType.kX)));
-      //This code allows shifting
+      //This code allows shifting manually
       if (Joystick1.getTriggerPressed()) 
       {
         Shifters.set(!Shifters.get());
       } 
+      //the automatic shifting only works when a butten is actively pressed for testing and safety purposes
       if (Joystick1.getRawButton(11)) 
       {
         //if ((Right.getSelectedSensorVelocity() < - 100) && (Left.getSelectedSensorVelocity() < - 100))
+        //this function calls the automatic shifting
         Robot.this.BackseatDriver();
       }
       //System.out.println(Left.getSelectedSensorVelocity());
@@ -194,7 +202,8 @@ public class Robot extends TimedRobot
   {
 
   }
-
+  /* This is the part of the code that reads the velocity of the encoders and shifts gears accordingly */
+  /* It is the heart and soul of this code */
   public void BackseatDriver()
   {
     if ((((Left.getSelectedSensorVelocity() + Right.getSelectedSensorVelocity()) / 2) < -10000) /*&& InLowGear*/)
